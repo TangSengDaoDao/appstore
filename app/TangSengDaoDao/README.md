@@ -14,9 +14,7 @@
 - 📱 多设备消息同步：支持 1 个移动端、多个 Web/PC 端同时在线时，并且支持多端之间的消息实时同步。
 - 📟 全平台支持：iOS，Android，Windows，MAC，Ubuntu，Web
 
-
 ## 为什么选择唐僧叨叨
-
 
 厂商 | Demo二开成本 | Web端同步 | 群人数 | 存储 | 开源 | 私有化部署
 ---|--- |--- |--- |---  |--- |---
@@ -25,8 +23,6 @@
 融云  | Demo简单，离运营级还有距离 | 消息同步，设置不能同步 | 3000 | 7天 | 否 | 未知
 环信  | Demo超简单，开发成运营级产品成本高 | app与web互踢  | 3000 | 7天（需联系商务） | 否 | 未知
 腾讯云IM | Demo简单，离运营级还有距离  | 大部分能实时同步 | 付费后最多扩展到6000人 | 30天/旗舰版 | 否 | 未知
-
-
 
 ## 唐僧叨叨的组成
 
@@ -42,19 +38,3 @@
 **管理端**
 
 [TangSengDaoDaoManager](https://github.com/TangSengDaoDao/TangSengDaoDaoManager)
-
-
-<!-- **全场景模拟平台**
-
-研发中... -->
-
-
-## 联系我们
-
-扫描拉入群（备注：唐僧叨叨）：
-
-<img src="https://tangsengdaodao.com/assets/tsdaodaowechat.04dd5809.jpg" style="width:400px">
-
-## 问题反馈
-
-如果在使用过程中发现任何问题、或者有改善建议，欢迎在 GitHub Issues 进行反馈：https://github.com/TangSengDaoDao/TangSengDaoDaoServer/issues
