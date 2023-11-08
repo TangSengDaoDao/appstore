@@ -139,7 +139,7 @@ additionalProperties:
       required: true
       type: number
     - default: 83
-      envKey: PANEL_APP_PORT_TS_APP_MANAGER
+      envKey: PANEL_APP_PORT_HTTP
       labelEn: TangSengDaoDao Management background port
       labelZh: 唐僧叨叨管理后台端口
       required: true

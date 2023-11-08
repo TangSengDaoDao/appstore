@@ -66,7 +66,7 @@ services:
     environment:
       - API_URL=http://${EXTERNAL_IP}:${PANEL_APP_PORT_TS_APP_HTTP}/
     ports:
-      - "${PANEL_APP_PORT_TS_APP_MANAGER}:80"
+      - "${PANEL_APP_PORT_HTTP}:80"
     networks:
       - 1panel-network
 networks:

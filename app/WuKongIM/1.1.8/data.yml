@@ -25,7 +25,7 @@ additionalProperties:
       required: true
       type: number
     - default: "5300"
-      envKey: PANEL_APP_PORT_WK_WEB_SERVER
+      envKey: PANEL_APP_PORT_HTTP
       labelEn: WuKongIM web port
       labelZh: 悟空IM监控端口
       required: true

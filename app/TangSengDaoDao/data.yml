@@ -5,7 +5,7 @@ title: 让企业轻松拥有自己的即时通讯
 type: 工具
 description: 让企业轻松拥有自己的即时通讯
 additionalProperties:
-  key: TangSengDaoDao
+  key: tangsengdaodao
   name: TangSengDaoDao
   tags:
     - Tool
