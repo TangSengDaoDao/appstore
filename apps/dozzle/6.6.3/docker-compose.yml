@@ -1,0 +1,15 @@
+version: '6.6.3'
+services:
+  logdozzle:
+    image: amir20/dozzle:v6.6.3
+    container_name: ${CONTAINER_NAME}
+    restart: always
+    ports:
+      - "${PANEL_APP_PORT_HTTP}:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - 1panel-network
+networks:
+  1panel-network:
+    external: true

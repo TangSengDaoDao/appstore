@@ -1,7 +1,8 @@
 version: '1.5.0'
 services:
   tsddwukongim:  # 唐僧叨叨通讯服务（悟空IM）
-    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:v1.1.8
+    container_name: ${CONTAINER_NAME}-wukongim
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:latest
     restart: always
     ports:
       - "${PANEL_APP_PORT_WK_TCP}:5100"  # tcp长连接端口（外网开放）
@@ -20,7 +21,8 @@ services:
     networks:
       - 1panel-network
   tangsengdaodaoserver:  # 唐僧叨叨的业务服务
-    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoserver:v1.5.0
+    container_name: ${CONTAINER_NAME}-tsdd-server
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoserver:latest
     restart: always
     command: "api"
     healthcheck:
@@ -52,7 +54,8 @@ services:
     networks:
       - 1panel-network
   tangsengdaodaoweb:  # 唐僧叨叨的web服务
-    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoweb:v1.0.0
+    container_name: ${CONTAINER_NAME}-tsdd-web
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoweb:latest
     restart: always
     environment:
       - API_URL=http://${EXTERNAL_IP}:${PANEL_APP_PORT_TS_APP_HTTP}/
@@ -61,7 +64,8 @@ services:
     networks:
       - 1panel-network
   tangsengdaodaomanager:  # 唐僧叨叨的后台管理系统
-    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaomanager:v1.0.0
+    container_name: ${CONTAINER_NAME}-tsdd-manager
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaomanager:latest
     restart: always
     environment:
       - API_URL=http://${EXTERNAL_IP}:${PANEL_APP_PORT_TS_APP_HTTP}/

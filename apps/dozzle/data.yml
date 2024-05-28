@@ -1,0 +1,19 @@
+name: Dozzle
+tags:
+  - 实用工具
+title: 一个轻量级的小应用程序，web的界面来监控Docker日志
+description: 一个轻量级的小应用程序，web的界面来监控Docker日志
+additionalProperties:
+  key: dozzle
+  name: Dozzle
+  tags:
+    - Tool
+  shortDescZh: 一个轻量级的小应用程序，有一个基于web的界面来监控Docker日志
+  shortDescEn: web-based interface to monitor Docker logs
+  type: tool
+  crossVersionUpdate: true
+  limit: 1
+  recommend: 0
+  website: https://dozzle.dev/
+  github: https://github.com/amir20/dozzle
+  document: https://dozzle.dev/guide/getting-started
