@@ -1,0 +1,14 @@
+version: '3.1'
+services:
+  wukongim:
+    container_name: ${CONTAINER_NAME}-wkim
+    image: wukongim/wukongim:latest
+    restart: always
+    volumes:
+      - ./wukongim:/root/wukongim
+    ports:
+      - ${WK_API}:5001 # http api 端口
+      - ${WK_TCP}:5100 # tcp端口
+      - ${WK_WS}:5200 # websocket端口
+      - ${WK_MONITOR}:5300 # monitor端口
+      - ${WK_DEMO_SERVER}:5172 # demo端口

@@ -249,7 +249,7 @@ function main() {
 
   # 将远程仓库的apps目录下的所有app复制到本地app_local_dir目录下
   cd "$repo_dir"
-  cp -rf apps/* "$app_local_dir"
+  cp -rf 1panel/apps/* "$app_local_dir"
 
   pwd
   ls -lah

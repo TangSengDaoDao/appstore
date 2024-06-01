@@ -1,0 +1,129 @@
+version: "3.0.0"
+services:
+  wukongim:
+    # 唐僧叨叨通讯服务（悟空IM）
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:latest
+    container_name: ${CONTAINER_NAME}-tsdd-wkim
+    restart: always
+    ports:
+      - "5100:5100" # tcp长连接端口（外网开放）
+      - "5200:5200" # websocket端口（外网开放）
+      - "5300:5300" # 监控端口
+    volumes:
+      - ./wukongim:/root/wukongim
+    environment:
+      - WK_MODE=${WK_MODE}
+      - WK_EXTERNAL_IP=${EXTERNAL_IP}
+      - WK_CONVERSATION_ON=true
+      - WK_WEBHOOK_GRPCADDR=tangsengdaodaoserver:6979
+      - WK_DATASOURCE_ADDR=http://tangsengdaodaoserver:8090/v1/datasource
+      - WK_DATASOURCE_CHANNELINFOON=true
+      - WK_TOKENAUTHON=true
+  tangsengdaodaoserver:
+    # 唐僧叨叨的业务服务
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoserver:latest
+    container_name: ${CONTAINER_NAME}-tsdd-serve
+    restart: always
+    command: "api"
+    healthcheck:
+      test: "wget -q -Y off -O /dev/null http://localhost:8090/v1/ping > /dev/null 2>&1"
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - redis
+      - mysql
+      - wukongim
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./tsdd/logs:/home/logs
+    environment:
+      - TS_MODE=${TS_MODE}
+      - TS_WUKONGIM_APIURL=http://wukongim:5001
+      - TS_DB_MYSQLADDR=root:${MYSQL_ROOT_PASSWORD}@tcp(mysql)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=true&loc=Local
+      - TS_DB_REDISADDR=redis:6379
+      - TS_EXTERNAL_IP=${EXTERNAL_IP}
+      - TS_SMSCODE=${TS_SMSCODE}
+      - TS_FILESERVICE=${TS_FILESERVICE}
+      - TS_MINIO_URL=http://minio:9001
+      - TS_MINIO_ACCESSKEYID=${MINIO_ROOT_USER}
+      - TS_MINIO_SECRETACCESSKEY=${MINIO_ROOT_PASSWORD}
+      - TS_AVATAR_DEFAULTBASEURL=https://api.multiavatar.com/{avatar}.png
+      - TS_ADMINPWD=${TS_ADMINPWD}
+  tangsengdaodaoweb:
+    # 唐僧叨叨的web服务
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoweb:latest
+    container_name: ${CONTAINER_NAME}-tsdd-web
+    restart: always
+    environment:
+      - API_URL=http://${EXTERNAL_IP}:8090/
+    ports:
+      - "82:80"
+  tangsengdaodaomanager:
+    # 唐僧叨叨的后台管理系统
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaomanager:latest
+    container_name: ${CONTAINER_NAME}-tsdd-manager
+    restart: always
+    environment:
+      - API_URL=http://${EXTERNAL_IP}:8090/
+    ports:
+      - "83:80"
+  minio:
+    # minio文件管理服务
+    image: minio/minio:RELEASE.2024-04-06T05-26-02Z # use a remote image
+    container_name: ${CONTAINER_NAME}-tsdd-minio
+    expose:
+      - "9000"
+      - "9001"
+    command: "server /data --console-address ':9001'"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:9000/minio/health/live"
+        ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    volumes:
+      - ./miniodata:/data
+  mysql:
+    # mysql数据库
+    image: mysql:8.0.33
+    container_name: ${CONTAINER_NAME}-tsdd-mysql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysqldata:/var/lib/mysql
+  redis:
+    # redis
+    image: redis:7.2.3
+    container_name: ${CONTAINER_NAME}-tsdd-redis
+    restart: always
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+  adminer:
+    # mysql web管理工具 调试用，为了安全生产不要打开
+    image: adminer:4.8.1
+    container_name: ${CONTAINER_NAME}-tsdd-adminer
+    ports:
+      - 8306:8080
