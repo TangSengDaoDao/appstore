@@ -2,7 +2,7 @@ version: '1.5.0'
 services:
   tsddwukongim:  # 唐僧叨叨通讯服务（悟空IM）
     container_name: ${CONTAINER_NAME}-wukongim
-    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:latest
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:v1.2
     restart: always
     ports:
       - "${PANEL_APP_PORT_WK_TCP}:5100"  # tcp长连接端口（外网开放）
@@ -22,7 +22,7 @@ services:
       - 1panel-network
   tangsengdaodaoserver:  # 唐僧叨叨的业务服务
     container_name: ${CONTAINER_NAME}-tsdd-server
-    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoserver:latest
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoserver:v1.5
     restart: always
     command: "api"
     healthcheck:

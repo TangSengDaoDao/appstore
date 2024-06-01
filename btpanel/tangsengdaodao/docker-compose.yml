@@ -1,8 +1,8 @@
-version: "3.0.0"
+version: "3.1"
 services:
   wukongim:
     # 唐僧叨叨通讯服务（悟空IM）
-    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:latest
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:v1.2
     container_name: ${CONTAINER_NAME}-tsdd-wkim
     restart: always
     ports:
@@ -11,17 +11,13 @@ services:
       - "5300:5300" # 监控端口
     volumes:
       - ./wukongim:/root/wukongim
+    env_file:
+      - .env
     environment:
-      - WK_MODE=${WK_MODE}
       - WK_EXTERNAL_IP=${EXTERNAL_IP}
-      - WK_CONVERSATION_ON=true
-      - WK_WEBHOOK_GRPCADDR=tangsengdaodaoserver:6979
-      - WK_DATASOURCE_ADDR=http://tangsengdaodaoserver:8090/v1/datasource
-      - WK_DATASOURCE_CHANNELINFOON=true
-      - WK_TOKENAUTHON=true
   tangsengdaodaoserver:
     # 唐僧叨叨的业务服务
-    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoserver:latest
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoserver:v1.5
     container_name: ${CONTAINER_NAME}-tsdd-serve
     restart: always
     command: "api"
@@ -38,19 +34,14 @@ services:
       - "8090:8090"
     volumes:
       - ./tsdd/logs:/home/logs
+    env_file:
+      - .env
     environment:
-      - TS_MODE=${TS_MODE}
-      - TS_WUKONGIM_APIURL=http://wukongim:5001
       - TS_DB_MYSQLADDR=root:${MYSQL_ROOT_PASSWORD}@tcp(mysql)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=true&loc=Local
-      - TS_DB_REDISADDR=redis:6379
       - TS_EXTERNAL_IP=${EXTERNAL_IP}
-      - TS_SMSCODE=${TS_SMSCODE}
       - TS_FILESERVICE=${TS_FILESERVICE}
-      - TS_MINIO_URL=http://minio:9001
       - TS_MINIO_ACCESSKEYID=${MINIO_ROOT_USER}
       - TS_MINIO_SECRETACCESSKEY=${MINIO_ROOT_PASSWORD}
-      - TS_AVATAR_DEFAULTBASEURL=https://api.multiavatar.com/{avatar}.png
-      - TS_ADMINPWD=${TS_ADMINPWD}
   tangsengdaodaoweb:
     # 唐僧叨叨的web服务
     image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoweb:latest
