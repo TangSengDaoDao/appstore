@@ -1,4 +1,4 @@
-version: '1.5.0'
+version: '3.1'
 services:
   tsddwukongim:  # 唐僧叨叨通讯服务（悟空IM）
     container_name: ${CONTAINER_NAME}-wukongim
@@ -47,7 +47,7 @@ services:
       - TS_SMSCODE=${TS_SMSCODE}
       - TS_ADMINPWD=${TS_ADMINPWD}
       - TS_FILESERVICE=minio
-      - TS_MINIO_URL=http://${MINIO_HOST}:${MINIO_PORT}
+      - TS_MINIO_URL=http://${EXTERNAL_IP}:${MINIO_PORT}
       - TS_MINIO_ACCESSKEYID=${MINIO_ROOT_USER}
       - TS_MINIO_SECRETACCESSKEY=${MINIO_ROOT_PASSWORD}
       - TS_AVATAR_DEFAULTBASEURL=https://api.multiavatar.com/{avatar}.png

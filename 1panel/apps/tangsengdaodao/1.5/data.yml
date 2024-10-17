@@ -73,7 +73,7 @@ additionalProperties:
       labelZh: minio 端口
       required: true
       type: number
-    - default: minio
+    - default: ""
       envKey: MINIO_ROOT_USER
       labelEn: minio
       labelZh: minio用户
@@ -81,7 +81,7 @@ additionalProperties:
       required: true
       rule: paramCommon
       type: text
-    - default: 123456
+    - default: ""
       envKey: MINIO_ROOT_PASSWORD
       labelEn: MinioPassword
       labelZh: minio用户密码
