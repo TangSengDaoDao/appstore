@@ -5,9 +5,9 @@ services:
     restart: always
     ports:
       # - "5001:5001" # http api端口（业务端调用，仅限内网开放）
-      - "5100:5100"  # tcp长连接端口（外网开放）
-      - "5200:5200" # websocket端口（外网开放）
-      - "5300:5300" # 监控端口
+      - "${WK_TCP_PORT}:5100"  # tcp长连接端口（外网开放）
+      - "${WK_WS_PORT}:5200" # websocket端口（外网开放）
+      - "${WK_WEB_SERVER_PORT}:5300" # 监控端口
     volumes:
       - ./wukongim:/root/wukongim
     env_file:
@@ -28,7 +28,7 @@ services:
        - mysql
        - wukongim
     ports:
-      - "8090:8090"
+      - "${TS_API_PORT}:8090"
     volumes:
       - ./tsdd:/home/tsdddata
       - ./tsdd/configs:/home/configs  # 如果需要使用yaml配置，在当前目录下创建tsdd/configs目录，并新建tsdd.yaml配置文件（注意：配置生效优先级environment高于配置文件，如果你配置了environment将覆盖tsdd.yaml的配置项）
@@ -46,14 +46,14 @@ services:
     environment:
       - API_URL=http://tangsengdaodaoserver:8090/
     ports:
-      - "82:80"
+      - "${TS_WEB_PORT}:80"
   tangsengdaodaomanager:  # 唐僧叨叨的后台管理系统
     image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaomanager:latest
     restart: always
     environment:
       - API_URL=http://tangsengdaodaoserver:8090/
     ports:
-      - "83:80"
+      - "${TS_MANAGEMENT_PORT}:80"
   minio: # minio文件管理服务
     image: registry.cn-shanghai.aliyuncs.com/wukongim/minio:RELEASE.2023-07-18T17-49-40Z # minio/minio:RELEASE.2023-07-18T17-49-40Z
     expose:
