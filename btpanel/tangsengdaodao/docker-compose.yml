@@ -1,12 +1,11 @@
-version: "3.1"
+version: '3.1'
 services:
-  wukongim:
-    # 唐僧叨叨通讯服务（悟空IM）
-    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:v1.2
-    container_name: ${CONTAINER_NAME}-tsdd-wkim
+  wukongim:  # 唐僧叨叨通讯服务（悟空IM）
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:v2
     restart: always
     ports:
-      - "5100:5100" # tcp长连接端口（外网开放）
+      # - "5001:5001" # http api端口（业务端调用，仅限内网开放）
+      - "5100:5100"  # tcp长连接端口（外网开放）
       - "5200:5200" # websocket端口（外网开放）
       - "5300:5300" # 监控端口
     volumes:
@@ -15,10 +14,8 @@ services:
       - .env
     environment:
       - WK_EXTERNAL_IP=${EXTERNAL_IP}
-  tangsengdaodaoserver:
-    # 唐僧叨叨的业务服务
+  tangsengdaodaoserver:  # 唐僧叨叨的业务服务
     image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoserver:v1.5
-    container_name: ${CONTAINER_NAME}-tsdd-serve
     restart: always
     command: "api"
     healthcheck:
@@ -27,13 +24,14 @@ services:
       timeout: 10s
       retries: 3
     depends_on:
-      - redis
-      - mysql
-      - wukongim
+       - redis
+       - mysql
+       - wukongim
     ports:
       - "8090:8090"
     volumes:
-      - ./tsdd/logs:/home/logs
+      - ./tsdd:/home/tsdddata
+      - ./tsdd/configs:/home/configs  # 如果需要使用yaml配置，在当前目录下创建tsdd/configs目录，并新建tsdd.yaml配置文件（注意：配置生效优先级environment高于配置文件，如果你配置了environment将覆盖tsdd.yaml的配置项）
     env_file:
       - .env
     environment:
@@ -42,28 +40,22 @@ services:
       - TS_FILESERVICE=${TS_FILESERVICE}
       - TS_MINIO_ACCESSKEYID=${MINIO_ROOT_USER}
       - TS_MINIO_SECRETACCESSKEY=${MINIO_ROOT_PASSWORD}
-  tangsengdaodaoweb:
-    # 唐僧叨叨的web服务
+  tangsengdaodaoweb:  # 唐僧叨叨的web服务
     image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoweb:latest
-    container_name: ${CONTAINER_NAME}-tsdd-web
     restart: always
     environment:
-      - API_URL=http://${EXTERNAL_IP}:8090/
+      - API_URL=http://tangsengdaodaoserver:8090/
     ports:
       - "82:80"
-  tangsengdaodaomanager:
-    # 唐僧叨叨的后台管理系统
+  tangsengdaodaomanager:  # 唐僧叨叨的后台管理系统
     image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaomanager:latest
-    container_name: ${CONTAINER_NAME}-tsdd-manager
     restart: always
     environment:
-      - API_URL=http://${EXTERNAL_IP}:8090/
+      - API_URL=http://tangsengdaodaoserver:8090/
     ports:
       - "83:80"
-  minio:
-    # minio文件管理服务
-    image: minio/minio:RELEASE.2024-04-06T05-26-02Z # use a remote image
-    container_name: ${CONTAINER_NAME}-tsdd-minio
+  minio: # minio文件管理服务
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/minio:RELEASE.2023-07-18T17-49-40Z # minio/minio:RELEASE.2023-07-18T17-49-40Z
     expose:
       - "9000"
       - "9001"
@@ -75,46 +67,28 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-f",
-          "http://localhost:9000/minio/health/live"
-        ]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
     volumes:
       - ./miniodata:/data
-  mysql:
-    # mysql数据库
-    image: mysql:8.0.33
-    container_name: ${CONTAINER_NAME}-tsdd-mysql
+  mysql:  # mysql数据库
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/mysql:8.0.33 # mysql:8.0.33
     command: --default-authentication-plugin=mysql_native_password
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+    volumes:
+      - ./mysqldata:/var/lib/mysql
     environment:
       - TZ=Asia/Shanghai
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
-    ports:
-      - 3306:3306
-    volumes:
-      - ./mysqldata:/var/lib/mysql
-  redis:
-    # redis
-    image: redis:7.2.3
-    container_name: ${CONTAINER_NAME}-tsdd-redis
+  redis:  # redis
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/redis:7.2.3 # redis:7.2.3
     restart: always
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 1s
       timeout: 3s
       retries: 30
-  adminer:
-    # mysql web管理工具 调试用，为了安全生产不要打开
-    image: adminer:4.8.1
-    container_name: ${CONTAINER_NAME}-tsdd-adminer
-    ports:
-      - 8306:8080
